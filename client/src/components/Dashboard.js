@@ -7,7 +7,7 @@ import { FaUserCircle, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import "../styles/Dashboard.css";
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL || "";
 
 function Dashboard({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
