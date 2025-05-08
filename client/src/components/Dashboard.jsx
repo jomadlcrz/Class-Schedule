@@ -7,6 +7,7 @@ import { FaPlus, FaEdit, FaTrash, FaSignOutAlt } from "react-icons/fa";
 import "../styles/Dashboard.css";
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
 import logo from "../assets/logo.png";
+import { motion } from "framer-motion";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
@@ -146,14 +147,20 @@ function Dashboard({ user, onLogout }) {
       </header>
 
       <main className="dashboard-content">
-        <div className="actions-bar">
+        <motion.div
+          className="actions-bar"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           <div className="program-info">
             <p>B.S. INFORMATION TECHNOLOGY</p>
           </div>
           <button className="add-button" onClick={handleAddCourse}>
             <FaPlus /> Add Course
           </button>
-        </div>
+        </motion.div>
 
         {width <= 768 ? (
           <div className="mobile-courses-list">
@@ -163,7 +170,14 @@ function Dashboard({ user, onLogout }) {
               <div className="empty-message">No courses found. Add a course to get started.</div>
             ) : (
               courses.map((course) => (
-                <div className="course-card" key={course._id}>
+                <motion.div
+                  className="course-card"
+                  key={course._id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
                   <div className="course-card-header">
                     <div>
                       <span className="course-card-code">{course.courseCode}</span>
@@ -179,12 +193,18 @@ function Dashboard({ user, onLogout }) {
                   <div className="course-card-detail"><b>Time:</b> {course.time}</div>
                   <div className="course-card-detail"><b>Room:</b> {course.room}</div>
                   <div className="course-card-detail"><b>Instructor:</b> <span className="course-card-instructor">{course.instructor}</span></div>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         ) : (
-          <div className="table-container">
+          <motion.div
+            className="table-container"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
             <table className="courses-table">
               <thead>
                 <tr>
@@ -213,7 +233,13 @@ function Dashboard({ user, onLogout }) {
                   </tr>
                 ) : (
                   courses.map((course) => (
-                    <tr key={course._id}>
+                    <motion.tr
+                      key={course._id}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    >
                       <td>{course.courseCode}</td>
                       <td>{course.title}</td>
                       <td>{course.units}</td>
@@ -239,12 +265,12 @@ function Dashboard({ user, onLogout }) {
                           </button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))
                 )}
               </tbody>
             </table>
-          </div>
+          </motion.div>
         )}
       </main>
 
