@@ -66,3 +66,33 @@ p {
         height: 60px;
     }
 }
+
+.custom-google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #d3d3d3;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #222;
+    padding: 12px 24px;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow 0.15s, border 0.15s;
+    outline: none;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 320px;
+}
+.custom-google-btn:hover, .custom-google-btn:focus {
+    box-shadow: 0 2px 8px rgba(66,133,244,0.10);
+    border: 1.5px solid #4285f4;
+}
+.google-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+}

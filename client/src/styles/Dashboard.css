@@ -409,6 +409,24 @@
         color: #444;
         font-weight: 500;
     }
+
+    .action-tooltip {
+        display: none !important;
+    }
+    .action-buttons .edit-button, .action-buttons .delete-button,
+    .course-card-actions .edit-button, .course-card-actions .delete-button {
+        pointer-events: auto;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .action-tooltip {
+        display: none !important;
+    }
+    .action-buttons .edit-button, .action-buttons .delete-button,
+    .course-card-actions .edit-button, .course-card-actions .delete-button {
+        pointer-events: auto;
+    }
 }
 
 /* Add styles for very small screens */
