@@ -6,8 +6,20 @@ import CourseModal from "./CourseModal";
 import { FaPlus, FaEdit, FaTrash, FaSignOutAlt } from "react-icons/fa";
 import "../styles/Dashboard.css";
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
+import logo from "../assets/logo.png";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+
+// Add a hook to get window width
+function useWindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return width;
+}
 
 function Dashboard({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
@@ -17,6 +29,8 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const width = useWindowWidth();
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
@@ -106,8 +120,8 @@ function Dashboard({ user, onLogout }) {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-left">
+          <img src={logo} alt="Logo" className="header-logo" />
           <h1>CLASS SCHEDULE</h1>
-          <p>B.S. INFORMATION TECHNOLOGY</p>
         </div>
         <div className="header-right">
           <div className="user-menu">
@@ -133,70 +147,103 @@ function Dashboard({ user, onLogout }) {
 
       <main className="dashboard-content">
         <div className="actions-bar">
-          <button className="add-button " onClick={handleAddCourse}>
+          <div className="program-info">
+            <p>B.S. INFORMATION TECHNOLOGY</p>
+          </div>
+          <button className="add-button" onClick={handleAddCourse}>
             <FaPlus /> Add Course
           </button>
         </div>
 
-        <div className="table-container">
-          <table className="courses-table">
-            <thead>
-              <tr>
-                <th>Course Code</th>
-                <th>Descriptive Title</th>
-                <th>Units</th>
-                <th>Days</th>
-                <th>Time</th>
-                <th>Room</th>
-                <th>Instructor</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
+        {width <= 768 ? (
+          <div className="mobile-courses-list">
+            {isLoading ? (
+              <div className="loading-message">Loading...</div>
+            ) : courses.length === 0 ? (
+              <div className="empty-message">No courses found. Add a course to get started.</div>
+            ) : (
+              courses.map((course) => (
+                <div className="course-card" key={course._id}>
+                  <div className="course-card-header">
+                    <div>
+                      <span className="course-card-code">{course.courseCode}</span>
+                      <div className="course-card-title">{course.title}</div>
+                    </div>
+                    <div className="course-card-actions">
+                      <button className="edit-button" onClick={() => handleEditCourse(course)}><FaEdit /></button>
+                      <button className="delete-button" onClick={() => handleDeleteCourse(course._id)}><FaTrash /></button>
+                    </div>
+                  </div>
+                  <div className="course-card-detail"><b>Units:</b> {course.units}</div>
+                  <div className="course-card-detail"><b>Days:</b> {course.days}</div>
+                  <div className="course-card-detail"><b>Time:</b> {course.time}</div>
+                  <div className="course-card-detail"><b>Room:</b> {course.room}</div>
+                  <div className="course-card-detail"><b>Instructor:</b> <span className="course-card-instructor">{course.instructor}</span></div>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="table-container">
+            <table className="courses-table">
+              <thead>
                 <tr>
-                  <td colSpan="8" className="loading-message">
-                    Loading...
-                  </td>
+                  <th>Course Code</th>
+                  <th>Descriptive Title</th>
+                  <th>Units</th>
+                  <th>Days</th>
+                  <th>Time</th>
+                  <th>Room</th>
+                  <th>Instructor</th>
+                  <th>Actions</th>
                 </tr>
-              ) : courses.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="empty-message">
-                    No courses found. Add a course to get started.
-                  </td>
-                </tr>
-              ) : (
-                courses.map((course) => (
-                  <tr key={course._id}>
-                    <td>{course.courseCode}</td>
-                    <td>{course.title}</td>
-                    <td>{course.units}</td>
-                    <td>{course.days}</td>
-                    <td>{course.time}</td>
-                    <td>{course.room}</td>
-                    <td>{course.instructor}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          className="edit-button"
-                          onClick={() => handleEditCourse(course)}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          className="delete-button"
-                          onClick={() => handleDeleteCourse(course._id)}
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="8" className="loading-message">
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : courses.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="empty-message">
+                      No courses found. Add a course to get started.
+                    </td>
+                  </tr>
+                ) : (
+                  courses.map((course) => (
+                    <tr key={course._id}>
+                      <td>{course.courseCode}</td>
+                      <td>{course.title}</td>
+                      <td>{course.units}</td>
+                      <td>{course.days}</td>
+                      <td>{course.time}</td>
+                      <td>{course.room}</td>
+                      <td>{course.instructor}</td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            className="edit-button"
+                            onClick={() => handleEditCourse(course)}
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            className="delete-button"
+                            onClick={() => handleDeleteCourse(course._id)}
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </main>
 
       {isModalOpen && (
