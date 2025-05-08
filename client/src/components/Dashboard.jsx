@@ -119,7 +119,7 @@ function Dashboard({ user, onLogout }) {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <div className="header-left">
+        <div className="header-left nav-refresh" onClick={() => window.location.reload()} style={{cursor: 'pointer'}}>
           <img src={logo} alt="Logo" className="header-logo" />
           <h1>CLASS SCHEDULE</h1>
         </div>
