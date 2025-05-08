@@ -110,6 +110,7 @@ function Dashboard({ user, onLogout }) {
       fetchCourses();
     } catch (error) {
       console.error("Error saving course:", error);
+      throw error; // Propagate the error to be handled by the modal
     }
   };
 

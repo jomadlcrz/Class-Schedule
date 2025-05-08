@@ -115,6 +115,28 @@ app.get("/api/courses", authenticate, async (req, res) => {
 
 app.post("/api/courses", authenticate, async (req, res) => {
   try {
+    // Check for schedule conflict with same course code
+    const existingCourseCodeConflict = await Course.findOne({
+      courseCode: req.body.courseCode,
+      userEmail: req.user.email,
+      days: req.body.days,
+      time: req.body.time
+    });
+    if (existingCourseCodeConflict) {
+      return res.status(400).json({ message: "Schedule conflict: Course code already exists" });
+    }
+
+    // Check for schedule conflict with same title
+    const existingTitleConflict = await Course.findOne({
+      title: req.body.title,
+      userEmail: req.user.email,
+      days: req.body.days,
+      time: req.body.time
+    });
+    if (existingTitleConflict) {
+      return res.status(400).json({ message: "Schedule conflict: Course title already exists" });
+    }
+
     const newCourse = new Course({
       ...req.body,
       userEmail: req.user.email,
@@ -137,6 +159,30 @@ app.put("/api/courses/:id", authenticate, async (req, res) => {
 
     if (course.userEmail !== req.user.email) {
       return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Check for schedule conflict with same course code (excluding current course)
+    const existingCourseCodeConflict = await Course.findOne({
+      courseCode: req.body.courseCode,
+      userEmail: req.user.email,
+      days: req.body.days,
+      time: req.body.time,
+      _id: { $ne: req.params.id }
+    });
+    if (existingCourseCodeConflict) {
+      return res.status(400).json({ message: "Schedule conflict: Course code already exists" });
+    }
+
+    // Check for schedule conflict with same title (excluding current course)
+    const existingTitleConflict = await Course.findOne({
+      title: req.body.title,
+      userEmail: req.user.email,
+      days: req.body.days,
+      time: req.body.time,
+      _id: { $ne: req.params.id }
+    });
+    if (existingTitleConflict) {
+      return res.status(400).json({ message: "Schedule conflict: Course title already exists" });
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(

@@ -15,6 +15,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   });
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (course) {
@@ -40,17 +41,28 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       setStartTime("");
       setEndTime("");
     }
+    setError(""); // Clear any previous errors when modal opens
   }, [course, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(""); // Clear error when user makes changes
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     const timeString = startTime && endTime ? `${startTime} - ${endTime}` : "";
-    onSave({ ...formData, time: timeString });
+    try {
+      await onSave({ ...formData, time: timeString });
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred while saving the course");
+      }
+    }
   };
 
   if (!isOpen) return null;
@@ -65,6 +77,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
           </button>
         </div>
         <form onSubmit={handleSubmit}>
+          {error && <div className="error-message">{error}</div>}
           <div className="form-group">
             <label htmlFor="courseCode">Course Code</label>
             <input
