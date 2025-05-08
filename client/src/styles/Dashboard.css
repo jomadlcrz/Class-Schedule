@@ -44,8 +44,6 @@
     color: #333;
 }
 
-
-
 .logout-dropdown {
     position: absolute;
     right: 0;
@@ -58,11 +56,20 @@
     min-width: 200px;
 }
 
+.user-name {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
 .user-email {
     font-size: 14px;
     padding: 5px 10px;
     border-bottom: 1px solid #eee;
     margin-bottom: 5px;
+    color: #666;
 }
 
 .logout-button {
@@ -74,6 +81,13 @@
     padding: 5px 10px;
     text-align: left;
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logout-icon {
+    font-size: 16px;
 }
 
 .logout-button:hover {
@@ -159,8 +173,6 @@
 .delete-button:hover {
   background-color: #f0f0f0;
 }
-
-
 
 .edit-button {
     color: #2196f3;

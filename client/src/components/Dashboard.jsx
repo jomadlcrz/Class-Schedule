@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import CourseModal from "./CourseModal";
-import { FaUserCircle, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSignOutAlt } from "react-icons/fa";
 import "../styles/Dashboard.css";
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
 
-const API_URL = process.env.REACT_APP_API_URL || "";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 function Dashboard({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
@@ -111,12 +111,19 @@ function Dashboard({ user, onLogout }) {
         </div>
         <div className="header-right">
           <div className="user-menu">
-            <FaUserCircle className="user-icon" onClick={toggleLogout} />
+            <img 
+              src={user.imageUrl} 
+              alt="Profile" 
+              className="user-icon" 
+              onClick={toggleLogout}
+              style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}
+            />
             {showLogout && (
               <div className="logout-dropdown">
+                <p className="user-name">{user.name}</p>
                 <p className="user-email">{user.email}</p>
                 <button className="logout-button" onClick={onLogout}>
-                  Logout
+                  <FaSignOutAlt className="logout-icon" /> Logout
                 </button>
               </div>
             )}
