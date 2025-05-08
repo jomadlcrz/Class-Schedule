@@ -225,6 +225,38 @@
     opacity: 0.85;
 }
 
+.action-buttons .edit-button, .action-buttons .delete-button,
+.course-card-actions .edit-button, .course-card-actions .delete-button {
+  position: relative;
+}
+
+.action-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background: #222;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 120%;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.action-buttons .edit-button:hover .action-tooltip,
+.action-buttons .delete-button:hover .action-tooltip,
+.course-card-actions .edit-button:hover .action-tooltip,
+.course-card-actions .delete-button:hover .action-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
     .header-logo {
         height: 32px;

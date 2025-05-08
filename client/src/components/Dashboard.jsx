@@ -228,12 +228,14 @@ function Dashboard({ user, onLogout }) {
                             onClick={() => handleEditCourse(course)}
                           >
                             <FaEdit />
+                            <span className="action-tooltip">Edit</span>
                           </button>
                           <button
                             className="delete-button"
                             onClick={() => handleDeleteCourse(course._id)}
                           >
                             <FaTrash />
+                            <span className="action-tooltip">Delete</span>
                           </button>
                         </div>
                       </td>
