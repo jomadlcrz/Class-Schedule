@@ -17,6 +17,24 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
 
+  // Generate time options from 7:00 AM to 9:00 PM
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 7; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour > 12 ? hour - 12 : hour;
+        const time = `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${period}`;
+        // Store 24-hour format as value but display 12-hour format
+        const value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        options.push({ value, time });
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
   useEffect(() => {
     if (course) {
       setFormData(course);
@@ -41,19 +59,46 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       setStartTime("");
       setEndTime("");
     }
-    setError(""); // Clear any previous errors when modal opens
+    setError("");
   }, [course, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(""); // Clear error when user makes changes
+    setError("");
+  };
+
+  const handleStartTimeChange = (e) => {
+    const newStartTime = e.target.value;
+    setStartTime(newStartTime);
+    // If end time is earlier than new start time, reset it
+    if (endTime && newStartTime > endTime) {
+      setEndTime("");
+    }
+  };
+
+  const handleEndTimeChange = (e) => {
+    const newEndTime = e.target.value;
+    if (!startTime) {
+      setError("Please select start time first");
+      return;
+    }
+    if (newEndTime <= startTime) {
+      setError("End time must be later than start time");
+      return;
+    }
+    setEndTime(newEndTime);
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const timeString = startTime && endTime ? `${startTime} - ${endTime}` : "";
+    if (!startTime || !endTime) {
+      setError("Please select both start and end times");
+      return;
+    }
+    const timeString = `${startTime} - ${endTime}`;
     try {
       await onSave({ ...formData, time: timeString });
     } catch (error) {
@@ -108,7 +153,6 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
               name="units"
               value={formData.units}
               onChange={e => {
-                // Only allow up to 2 digits
                 let value = e.target.value.replace(/[^0-9]/g, '').slice(0,2);
                 setFormData(prev => ({ ...prev, units: value }));
               }}
@@ -134,23 +178,40 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
           <div className="form-group">
             <label htmlFor="time">Time</label>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <input
-                type="time"
+              <select
                 id="startTime"
                 name="startTime"
                 value={startTime}
-                onChange={e => setStartTime(e.target.value)}
+                onChange={handleStartTimeChange}
                 required
-              />
+                className="time-select"
+              >
+                <option value="">Select start time</option>
+                {timeOptions.map(({ value, time }) => (
+                  <option key={`start-${value}`} value={value}>
+                    {time}
+                  </option>
+                ))}
+              </select>
               <span>-</span>
-              <input
-                type="time"
+              <select
                 id="endTime"
                 name="endTime"
                 value={endTime}
-                onChange={e => setEndTime(e.target.value)}
+                onChange={handleEndTimeChange}
                 required
-              />
+                className="time-select"
+                disabled={!startTime}
+              >
+                <option value="">Select end time</option>
+                {timeOptions
+                  .filter(({ value }) => !startTime || value > startTime)
+                  .map(({ value, time }) => (
+                    <option key={`end-${value}`} value={value}>
+                      {time}
+                    </option>
+                  ))}
+              </select>
             </div>
           </div>
           <div className="form-group">
