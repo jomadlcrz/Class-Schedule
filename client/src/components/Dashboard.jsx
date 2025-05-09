@@ -30,7 +30,6 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState("table");
 
   const width = useWindowWidth();
 
@@ -155,7 +154,14 @@ function Dashboard({ user, onLogout }) {
             src={window.preloadedImages?.logo || logo} 
             alt="Logo" 
             className="header-logo"
-            style={{ opacity: 1 }}
+            style={{ 
+              opacity: 1,
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none',
+              pointerEvents: 'none'
+            }}
           />
           <h1>CLASS SCHEDULE</h1>
         </div>
@@ -166,7 +172,17 @@ function Dashboard({ user, onLogout }) {
               alt="Profile" 
               className="user-icon"
               onClick={toggleLogout}
-              style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', opacity: 1 }}
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                cursor: 'pointer', 
+                opacity: 1,
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none'
+              }}
             />
             {showLogout && (
               <div className="logout-dropdown">
