@@ -251,13 +251,48 @@ function Dashboard({ user, onLogout }) {
             </button>
             {showSortMenu && (
               <div className="sort-menu">
-                <button onClick={() => handleSort('courseCode')}>Course Code</button>
-                <button onClick={() => handleSort('title')}>Title</button>
-                <button onClick={() => handleSort('units')}>Units</button>
-                <button onClick={() => handleSort('days')}>Days</button>
-                <button onClick={() => handleSort('time')}>Time</button>
-                <button onClick={() => handleSort('room')}>Room</button>
-                <button onClick={() => handleSort('instructor')}>Instructor</button>
+                <button 
+                  onClick={() => handleSort('courseCode')}
+                  className={sortConfig.key === 'courseCode' ? 'active' : ''}
+                >
+                  Course Code
+                </button>
+                <button 
+                  onClick={() => handleSort('title')}
+                  className={sortConfig.key === 'title' ? 'active' : ''}
+                >
+                  Title
+                </button>
+                <button 
+                  onClick={() => handleSort('units')}
+                  className={sortConfig.key === 'units' ? 'active' : ''}
+                >
+                  Units
+                </button>
+                <button 
+                  onClick={() => handleSort('days')}
+                  className={sortConfig.key === 'days' ? 'active' : ''}
+                >
+                  Days
+                </button>
+                <button 
+                  onClick={() => handleSort('time')}
+                  className={sortConfig.key === 'time' ? 'active' : ''}
+                >
+                  Time
+                </button>
+                <button 
+                  onClick={() => handleSort('room')}
+                  className={sortConfig.key === 'room' ? 'active' : ''}
+                >
+                  Room
+                </button>
+                <button 
+                  onClick={() => handleSort('instructor')}
+                  className={sortConfig.key === 'instructor' ? 'active' : ''}
+                >
+                  Instructor
+                </button>
               </div>
             )}
           </div>
