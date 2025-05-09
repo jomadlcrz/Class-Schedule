@@ -16,6 +16,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
+  const [originalData, setOriginalData] = useState(null);
 
   // Generate time options from 7:00 AM to 9:00 PM
   const generateTimeOptions = () => {
@@ -34,33 +35,6 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   };
 
   const timeOptions = generateTimeOptions();
-
-  useEffect(() => {
-    if (course) {
-      setFormData(course);
-      if (course.time && course.time.includes("-")) {
-        const [start, end] = course.time.split("-").map(s => s.trim());
-        setStartTime(start ? start.padStart(5, '0').slice(0,5) : "");
-        setEndTime(end ? end.padStart(5, '0').slice(0,5) : "");
-      } else {
-        setStartTime("");
-        setEndTime("");
-      }
-    } else {
-      setFormData({
-        courseCode: "",
-        title: "",
-        units: "",
-        days: "",
-        time: "",
-        room: "",
-        instructor: "",
-      });
-      setStartTime("");
-      setEndTime("");
-    }
-    setError("");
-  }, [course, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,10 +84,87 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
     }
   };
 
+  useEffect(() => {
+    if (course) {
+      const newFormData = { ...course };
+      setFormData(newFormData);
+      let startTimeValue = "";
+      let endTimeValue = "";
+      
+      if (course.time && course.time.includes("-")) {
+        const [start, end] = course.time.split("-").map(s => s.trim());
+        startTimeValue = start ? start.padStart(5, '0').slice(0,5) : "";
+        endTimeValue = end ? end.padStart(5, '0').slice(0,5) : "";
+        setStartTime(startTimeValue);
+        setEndTime(endTimeValue);
+      } else {
+        setStartTime("");
+        setEndTime("");
+      }
+      // Store original data for edit mode
+      setOriginalData({
+        ...newFormData,
+        startTime: startTimeValue,
+        endTime: endTimeValue
+      });
+    } else {
+      setFormData({
+        courseCode: "",
+        title: "",
+        units: "",
+        days: "",
+        time: "",
+        room: "",
+        instructor: "",
+      });
+      setStartTime("");
+      setEndTime("");
+      setOriginalData(null);
+    }
+    setError("");
+  }, [course, isOpen]);
+
+  const hasChanges = () => {
+    if (!course) return false; // For new course, always consider as changed
+    if (!originalData) return true;
+    
+    return formData.courseCode !== originalData.courseCode ||
+           formData.title !== originalData.title ||
+           formData.units !== originalData.units ||
+           formData.days !== originalData.days ||
+           formData.room !== originalData.room ||
+           formData.instructor !== originalData.instructor ||
+           startTime !== originalData.startTime ||
+           endTime !== originalData.endTime;
+  };
+
+  const hasAnyValue = () => {
+    return formData.courseCode || 
+           formData.title || 
+           formData.units || 
+           formData.days || 
+           startTime || 
+           endTime || 
+           formData.room || 
+           formData.instructor;
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={(e) => {
+      // For add form: prevent closing if any field has value
+      // For edit form: prevent closing if there are changes
+      if (e.target === e.currentTarget) {
+        if (!course && hasAnyValue()) {
+          return; // Don't close if any field has value in add form
+        }
+        if (course && hasChanges()) {
+          return; // Don't close if there are changes in edit form
+        }
+        onClose();
+      }
+    }}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{course ? "Edit Course" : "Add New Course"}</h2>
