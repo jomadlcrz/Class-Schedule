@@ -30,8 +30,19 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isLogoLoaded, setIsLogoLoaded] = useState(false);
+  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false);
 
   const width = useWindowWidth();
+
+  useEffect(() => {
+    // Check if images were previously loaded
+    const previouslyLoaded = localStorage.getItem('imagesLoaded') === 'true';
+    if (previouslyLoaded) {
+      setIsLogoLoaded(true);
+      setIsProfileImageLoaded(true);
+    }
+  }, []);
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
@@ -122,7 +133,12 @@ function Dashboard({ user, onLogout }) {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-left nav-refresh" onClick={() => window.location.reload()} style={{cursor: 'pointer'}}>
-          <img src={logo} alt="Logo" className="header-logo" />
+          <img 
+            src={window.preloadedImages?.logo || logo} 
+            alt="Logo" 
+            className="header-logo"
+            style={{ opacity: 1 }}
+          />
           <h1>CLASS SCHEDULE</h1>
         </div>
         <div className="header-right">
@@ -130,9 +146,9 @@ function Dashboard({ user, onLogout }) {
             <img 
               src={user.imageUrl} 
               alt="Profile" 
-              className="user-icon" 
+              className="user-icon"
               onClick={toggleLogout}
-              style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}
+              style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', opacity: 1 }}
             />
             {showLogout && (
               <div className="logout-dropdown">

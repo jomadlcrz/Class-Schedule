@@ -1,9 +1,12 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import { useState } from "react";
 import logo from "../assets/logo.png";
 import "../styles/Login.css";
 
 function Login({ onLogin }) {
+  const [isLogoLoaded, setIsLogoLoaded] = useState(false);
+
   const handleSuccess = (credentialResponse) => {
     const decoded = jwtDecode(credentialResponse.credential);
     const userData = {
@@ -22,7 +25,12 @@ function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <img src={logo || "/placeholder.svg"} alt="GWC Logo" className="logo" />
+        <img 
+          src={window.preloadedImages?.logo || logo} 
+          alt="GWC Logo" 
+          className="logo"
+          style={{ opacity: 1 }}
+        />
         <h1>Class Schedule System</h1>
         <p>
           Please sign in with your Google account to access your class schedule.

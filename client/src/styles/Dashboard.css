@@ -1,11 +1,18 @@
 * {
     -webkit-tap-highlight-color: transparent !important;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 .dashboard-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 .dashboard-header {
@@ -358,6 +365,7 @@
         flex-direction: column;
         gap: 16px;
         overflow-x: hidden;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     .course-card {
         background: #fff;
