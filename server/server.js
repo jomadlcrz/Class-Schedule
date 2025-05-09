@@ -23,6 +23,11 @@ const mongoClient = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
+  maxPoolSize: 10,
+  minPoolSize: 5,
+  maxIdleTimeMS: 60000,
+  connectTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
 });
 
 async function run() {
@@ -31,24 +36,48 @@ async function run() {
     await mongoClient.connect();
     // Send a ping to confirm a successful connection
     await mongoClient.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // Use Mongoose with the existing MongoClient instance
-    mongoose.connect(uri, {
+    await mongoose.connect(uri, {
       dbName: "Cluster0",
       autoCreate: true,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      retryWrites: true,
+      retryReads: true,
     });
+
     const db = mongoose.connection;
-    db.on("error", console.error.bind(console, "MongoDB connection error:"));
+    db.on("error", (error) => {
+      console.error("MongoDB connection error:", error);
+      // Attempt to reconnect after 5 seconds
+      setTimeout(() => {
+        console.log("Attempting to reconnect to MongoDB...");
+        run().catch(console.dir);
+      }, 5000);
+    });
+    
     db.once("open", () => {
       console.log("Mongoose connected to MongoDB");
     });
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await mongoClient.close();
+
+    // Handle application shutdown
+    process.on('SIGINT', async () => {
+      await mongoose.connection.close();
+      await mongoClient.close();
+      process.exit(0);
+    });
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    // Attempt to reconnect after 5 seconds
+    setTimeout(() => {
+      console.log("Attempting to reconnect to MongoDB...");
+      run().catch(console.dir);
+    }, 5000);
   }
 }
 run().catch(console.dir);
