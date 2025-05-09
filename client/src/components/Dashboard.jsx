@@ -30,8 +30,35 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState("table");
 
   const width = useWindowWidth();
+
+  // Function to convert 24h time to 12h format
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const [start, end] = timeStr.split(" - ").map(t => t.trim());
+    if (!start || !end) return timeStr;
+
+    const formatSingleTime = (time) => {
+      const [hours, minutes] = time.split(":");
+      const hour = parseInt(hours);
+      const period = hour >= 12 ? "PM" : "AM";
+      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+      return `${displayHour.toString().padStart(2, "0")}:${minutes} ${period}`;
+    };
+
+    return `${formatSingleTime(start)} - ${formatSingleTime(end)}`;
+  };
+
+  // Function to sort courses by time
+  const sortCoursesByTime = (coursesToSort) => {
+    return [...coursesToSort].sort((a, b) => {
+      const [aStart] = a.time.split(" - ").map(t => t.trim());
+      const [bStart] = b.time.split(" - ").map(t => t.trim());
+      return aStart.localeCompare(bStart);
+    });
+  };
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
@@ -110,13 +137,15 @@ function Dashboard({ user, onLogout }) {
       fetchCourses();
     } catch (error) {
       console.error("Error saving course:", error);
-      throw error; // Propagate the error to be handled by the modal
     }
   };
 
   const toggleLogout = () => {
     setShowLogout(!showLogout);
   };
+
+  // Sort courses before rendering
+  const sortedCourses = sortCoursesByTime(courses);
 
   return (
     <div className="dashboard-container">
@@ -178,10 +207,10 @@ function Dashboard({ user, onLogout }) {
           >
             {isLoading ? (
               <div className="loading-message">Loading...</div>
-            ) : courses.length === 0 ? (
+            ) : sortedCourses.length === 0 ? (
               <div className="empty-message">No courses found. Add a course to get started.</div>
             ) : (
-              courses.map((course) => (
+              sortedCourses.map((course) => (
                 <motion.div
                   className="course-card"
                   key={course._id}
@@ -202,7 +231,7 @@ function Dashboard({ user, onLogout }) {
                   </div>
                   <div className="course-card-detail"><b>Units:</b> {course.units}</div>
                   <div className="course-card-detail"><b>Days:</b> {course.days}</div>
-                  <div className="course-card-detail"><b>Time:</b> {course.time}</div>
+                  <div className="course-card-detail"><b>Time:</b> {formatTime(course.time)}</div>
                   <div className="course-card-detail"><b>Room:</b> {course.room}</div>
                   <div className="course-card-detail"><b>Instructor:</b> <span className="course-card-instructor">{course.instructor}</span></div>
                 </motion.div>
@@ -237,14 +266,14 @@ function Dashboard({ user, onLogout }) {
                       Loading...
                     </td>
                   </tr>
-                ) : courses.length === 0 ? (
+                ) : sortedCourses.length === 0 ? (
                   <tr>
                     <td colSpan="8" className="empty-message">
                       No courses found. Add a course to get started.
                     </td>
                   </tr>
                 ) : (
-                  courses.map((course) => (
+                  sortedCourses.map((course) => (
                     <motion.tr
                       key={course._id}
                       initial={{ opacity: 0, y: 40 }}
@@ -256,7 +285,7 @@ function Dashboard({ user, onLogout }) {
                       <td>{course.title}</td>
                       <td>{course.units}</td>
                       <td>{course.days}</td>
-                      <td>{course.time}</td>
+                      <td>{formatTime(course.time)}</td>
                       <td>{course.room}</td>
                       <td>{course.instructor}</td>
                       <td>

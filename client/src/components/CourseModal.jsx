@@ -24,14 +24,15 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
     for (let hour = 7; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const period = hour >= 12 ? 'PM' : 'AM';
-        const displayHour = hour > 12 ? hour - 12 : hour;
+        const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
         const time = `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${period}`;
         // Store 24-hour format as value but display 12-hour format
         const value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         options.push({ value, time });
       }
     }
-    return options;
+    // Sort options by their 24-hour value
+    return options.sort((a, b) => a.value.localeCompare(b.value));
   };
 
   const timeOptions = generateTimeOptions();
