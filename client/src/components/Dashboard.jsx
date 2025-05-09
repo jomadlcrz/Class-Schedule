@@ -30,19 +30,8 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isLogoLoaded, setIsLogoLoaded] = useState(false);
-  const [isProfileImageLoaded, setIsProfileImageLoaded] = useState(false);
 
   const width = useWindowWidth();
-
-  useEffect(() => {
-    // Check if images were previously loaded
-    const previouslyLoaded = localStorage.getItem('imagesLoaded') === 'true';
-    if (previouslyLoaded) {
-      setIsLogoLoaded(true);
-      setIsProfileImageLoaded(true);
-    }
-  }, []);
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
