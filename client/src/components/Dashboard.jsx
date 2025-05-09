@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import CourseModal from "./CourseModal";
-import { FaPlus, FaEdit, FaTrash, FaSignOutAlt } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaSortAmountDown } from "react-icons/fa";
 import "../styles/Dashboard.css";
 import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
 import logo from "../assets/logo.png";
@@ -30,6 +30,12 @@ function Dashboard({ user, onLogout }) {
   const [showLogout, setShowLogout] = useState(false);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [sortConfig, setSortConfig] = useState(() => {
+    // Initialize sort config from localStorage or default to time/asc
+    const savedSort = localStorage.getItem('sortConfig');
+    return savedSort ? JSON.parse(savedSort) : { key: 'time', direction: 'asc' };
+  });
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   const width = useWindowWidth();
 
@@ -50,12 +56,36 @@ function Dashboard({ user, onLogout }) {
     return `${formatSingleTime(start)} - ${formatSingleTime(end)}`;
   };
 
-  // Function to sort courses by time
-  const sortCoursesByTime = (coursesToSort) => {
+  // Function to handle sorting
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    const newSortConfig = { key, direction };
+    setSortConfig(newSortConfig);
+    // Save to localStorage
+    localStorage.setItem('sortConfig', JSON.stringify(newSortConfig));
+    setShowSortMenu(false);
+  };
+
+  // Function to sort courses
+  const sortCourses = (coursesToSort) => {
     return [...coursesToSort].sort((a, b) => {
-      const [aStart] = a.time.split(" - ").map(t => t.trim());
-      const [bStart] = b.time.split(" - ").map(t => t.trim());
-      return aStart.localeCompare(bStart);
+      if (sortConfig.key === 'time') {
+        const [aStart] = a.time.split(" - ").map(t => t.trim());
+        const [bStart] = b.time.split(" - ").map(t => t.trim());
+        return sortConfig.direction === 'asc' 
+          ? aStart.localeCompare(bStart)
+          : bStart.localeCompare(aStart);
+      }
+      
+      const aValue = a[sortConfig.key]?.toLowerCase() || '';
+      const bValue = b[sortConfig.key]?.toLowerCase() || '';
+      
+      return sortConfig.direction === 'asc'
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     });
   };
 
@@ -144,7 +174,7 @@ function Dashboard({ user, onLogout }) {
   };
 
   // Sort courses before rendering
-  const sortedCourses = sortCoursesByTime(courses);
+  const sortedCourses = sortCourses(courses);
 
   return (
     <div className="dashboard-container">
@@ -212,6 +242,26 @@ function Dashboard({ user, onLogout }) {
             <FaPlus /> Add Course
           </button>
         </motion.div>
+
+        <div className="table-controls">
+          <div className="sort-container">
+            <button className="sort-button" onClick={() => setShowSortMenu(!showSortMenu)}>
+              <FaSortAmountDown />
+              <span className="action-tooltip">Sort</span>
+            </button>
+            {showSortMenu && (
+              <div className="sort-menu">
+                <button onClick={() => handleSort('courseCode')}>Course Code</button>
+                <button onClick={() => handleSort('title')}>Title</button>
+                <button onClick={() => handleSort('units')}>Units</button>
+                <button onClick={() => handleSort('days')}>Days</button>
+                <button onClick={() => handleSort('time')}>Time</button>
+                <button onClick={() => handleSort('room')}>Room</button>
+                <button onClick={() => handleSort('instructor')}>Instructor</button>
+              </div>
+            )}
+          </div>
+        </div>
 
         {width <= 768 ? (
           <motion.div
