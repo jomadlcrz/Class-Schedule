@@ -298,75 +298,20 @@
     }
 
     .table-container {
-        border-radius: 4px;
-        margin: 0 -10px;
-        width: calc(100% + 20px);
-    }
-
-    .courses-table {
-        min-width: 100%;
-    }
-
-    .courses-table th,
-    .courses-table td {
-        padding: 8px 10px;
-        font-size: 13px;
-    }
-
-    .action-buttons {
-        gap: 4px;
-    }
-
-    .edit-button,
-    .delete-button {
-        padding: 3px 6px;
-        font-size: 12px;
-    }
-
-    /* Stack table cells vertically on mobile */
-    .courses-table thead {
         display: none;
     }
 
-    .courses-table tbody tr {
-        display: block;
-        margin-bottom: 15px;
-        border: 1px solid #eee;
-        border-radius: 4px;
-        background: white;
-    }
-
-    .courses-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .courses-table td:last-child {
-        border-bottom: none;
-    }
-
-    .courses-table td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #333;
-        margin-right: 10px;
-    }
-
-    .courses-table td:last-child {
-        justify-content: flex-end;
-    }
-
-    /* Mobile course card styles */
     .mobile-courses-list {
         display: flex;
         flex-direction: column;
         gap: 16px;
+        padding: 0 10px;
+        width: 100%;
+        max-width: 100%;
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        -webkit-overflow-scrolling: touch;
     }
+
     .course-card {
         background: #fff;
         border-radius: 10px;
@@ -376,51 +321,45 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
+        width: 100%;
+        box-sizing: border-box;
     }
+
     .course-card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 6px;
+        width: 100%;
     }
+
     .course-card-code {
         font-weight: bold;
         font-size: 1.1rem;
         display: block;
         margin-bottom: 2px;
     }
+
     .course-card-title {
         font-size: 0.98rem;
         color: #888;
         margin-bottom: 2px;
+        word-break: break-word;
     }
+
     .course-card-actions {
         display: flex;
         gap: 8px;
+        flex-shrink: 0;
     }
-    .course-card-actions .edit-button,
-    .course-card-actions .delete-button {
-        background: none;
-        border: none;
-        padding: 4px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        color: #2196f3;
-        transition: background 0.15s;
-        border-radius: 4px;
-    }
-    .course-card-actions .delete-button {
-        color: #f44336;
-    }
-    .course-card-actions .edit-button:hover,
-    .course-card-actions .delete-button:hover {
-        background: #f0f0f0;
-    }
+
     .course-card-detail {
         font-size: 0.97rem;
         margin-bottom: 1px;
         color: #222;
+        word-break: break-word;
     }
+
     .course-card-instructor {
         color: #444;
         font-weight: 500;
@@ -428,10 +367,6 @@
 
     .action-tooltip {
         display: none !important;
-    }
-    .action-buttons .edit-button, .action-buttons .delete-button,
-    .course-card-actions .edit-button, .course-card-actions .delete-button {
-        pointer-events: auto;
     }
 }
 

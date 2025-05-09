@@ -169,7 +169,13 @@ function Dashboard({ user, onLogout }) {
         </motion.div>
 
         {width <= 768 ? (
-          <div className="mobile-courses-list">
+          <motion.div
+            className="mobile-courses-list"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
             {isLoading ? (
               <div className="loading-message">Loading...</div>
             ) : courses.length === 0 ? (
@@ -179,10 +185,10 @@ function Dashboard({ user, onLogout }) {
                 <motion.div
                   className="course-card"
                   key={course._id}
-                  initial={{ opacity: 0, y: 40 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                   <div className="course-card-header">
                     <div>
@@ -202,7 +208,7 @@ function Dashboard({ user, onLogout }) {
                 </motion.div>
               ))
             )}
-          </div>
+          </motion.div>
         ) : (
           <motion.div
             className="table-container"
