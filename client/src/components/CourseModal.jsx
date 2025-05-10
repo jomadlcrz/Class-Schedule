@@ -74,6 +74,13 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       setError("Please select both start and end times");
       return;
     }
+
+    // If in edit mode and no changes were made, just close the modal
+    if (course && !hasChanges()) {
+      onClose();
+      return;
+    }
+
     const timeString = `${startTime} - ${endTime}`;
     setIsSubmitting(true);
     try {
