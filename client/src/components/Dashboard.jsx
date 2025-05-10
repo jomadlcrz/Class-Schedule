@@ -17,9 +17,15 @@ import { motion } from "framer-motion";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-// Configure axios defaults
-axios.defaults.withCredentials = true;
-axios.defaults.headers.common['Content-Type'] = 'application/json';
+// Configure axios instance
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
 // Add a hook to get window width
 function useWindowWidth() {
@@ -93,12 +99,11 @@ function Dashboard({ user, onLogout }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/courses`, {
+      const response = await axiosInstance.get(`/courses`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         timeout: 5000,
-        withCredentials: true
       });
       setCourses(response.data);
     } catch (error) {
@@ -153,7 +158,7 @@ function Dashboard({ user, onLogout }) {
 
   const confirmDeleteCourse = async () => {
     try {
-      await axios.delete(`${API_URL}/courses/${courseToDeleteId}`, {
+      await axiosInstance.delete(`/courses/${courseToDeleteId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -176,8 +181,8 @@ function Dashboard({ user, onLogout }) {
     try {
       if (course._id) {
         // Update existing course
-        const response = await axios.put(
-          `${API_URL}/courses/${course._id}`,
+        const response = await axiosInstance.put(
+          `/courses/${course._id}`,
           course,
           {
             headers: {
@@ -190,7 +195,7 @@ function Dashboard({ user, onLogout }) {
         }
       } else {
         // Add new course
-        const response = await axios.post(`${API_URL}/courses`, course, {
+        const response = await axiosInstance.post(`/courses`, course, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
