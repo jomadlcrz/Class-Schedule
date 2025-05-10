@@ -17,6 +17,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
   const [originalData, setOriginalData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Generate time options from 7:00 AM to 9:00 PM
   const generateTimeOptions = () => {
@@ -74,14 +75,18 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       return;
     }
     const timeString = `${startTime} - ${endTime}`;
+    setIsSubmitting(true);
     try {
       await onSave({ ...formData, time: timeString });
+      onClose();
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message);
       } else {
         setError("An error occurred while saving the course");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -289,8 +294,8 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
             />
           </div>
           <div className="modal-footer">
-            <button type="submit" className="save-button">
-              {course ? "Update" : "Add"} Course
+            <button type="submit" className="save-button" disabled={isSubmitting}>
+              {isSubmitting ? "Please wait..." : (course ? "Update" : "Add") + " Course"}
             </button>
           </div>
         </form>

@@ -149,23 +149,31 @@ function Dashboard({ user, onLogout }) {
     try {
       if (course._id) {
         // Update existing course
-        await axios.put(`${API_URL}/courses/${course._id}`, course, {
+        const response = await axios.put(`${API_URL}/courses/${course._id}`, course, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         });
+        if (response.data) {
+          fetchCourses();
+        }
       } else {
         // Add new course
-        await axios.post(`${API_URL}/courses`, course, {
+        const response = await axios.post(`${API_URL}/courses`, course, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
         });
+        if (response.data) {
+          fetchCourses();
+        }
       }
-      setIsModalOpen(false);
-      fetchCourses();
     } catch (error) {
-      console.error("Error saving course:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        throw error; // This will be caught by CourseModal's handleSubmit
+      } else {
+        throw new Error("An error occurred while saving the course");
+      }
     }
   };
 
