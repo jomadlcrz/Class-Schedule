@@ -23,11 +23,17 @@ const mongoClient = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
-  maxPoolSize: 10,
-  minPoolSize: 5,
-  maxIdleTimeMS: 60000,
-  connectTimeoutMS: 10000,
-  socketTimeoutMS: 45000,
+  maxPoolSize: 50,
+  minPoolSize: 10,
+  maxIdleTimeMS: 30000,
+  connectTimeoutMS: 5000,
+  socketTimeoutMS: 30000,
+  keepAlive: true,
+  keepAliveInitialDelay: 300000,
+  retryWrites: true,
+  retryReads: true,
+  w: 'majority',
+  readPreference: 'primaryPreferred'
 });
 
 async function run() {
@@ -84,7 +90,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-// Course Schema
+// Course Schema with indexes
 const courseSchema = new mongoose.Schema({
   courseCode: { type: String, required: true },
   title: { type: String, required: true },
@@ -94,7 +100,14 @@ const courseSchema = new mongoose.Schema({
   room: { type: String, required: true },
   instructor: { type: String, required: true },
   userEmail: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
+
+// Add compound indexes for common queries
+courseSchema.index({ userEmail: 1, courseCode: 1 }, { unique: true });
+courseSchema.index({ userEmail: 1, title: 1 }, { unique: true });
+courseSchema.index({ userEmail: 1, days: 1, time: 1 });
+courseSchema.index({ userEmail: 1, createdAt: -1 });
 
 const Course = mongoose.model("Course", courseSchema);
 
@@ -136,7 +149,10 @@ app.get("/api", (req, res) => {
 
 app.get("/api/courses", authenticate, async (req, res) => {
   try {
-    const courses = await Course.find({ userEmail: req.user.email });
+    const courses = await Course.find({ userEmail: req.user.email })
+      .sort({ createdAt: -1 })
+      .lean()
+      .cache(60);
     res.json(courses);
   } catch (error) {
     console.error("Error fetching courses:", error);

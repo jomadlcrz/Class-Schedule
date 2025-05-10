@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import CourseModal from "./CourseModal";
 import {
@@ -37,18 +37,16 @@ function Dashboard({ user, onLogout }) {
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState(() => {
-    // Initialize sort config from localStorage or default to time/asc
     const savedSort = localStorage.getItem("sortConfig");
-    return savedSort
-      ? JSON.parse(savedSort)
-      : { key: "time", direction: "asc" };
+    return savedSort ? JSON.parse(savedSort) : { key: "time", direction: "asc" };
   });
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [error, setError] = useState(null);
 
   const width = useWindowWidth();
 
-  // Function to convert 24h time to 12h format
-  const formatTime = (timeStr) => {
+  // Memoize the formatTime function
+  const formatTime = useCallback((timeStr) => {
     if (!timeStr) return "";
     const [start, end] = timeStr.split(" - ").map((t) => t.trim());
     if (!start || !end) return timeStr;
@@ -62,23 +60,10 @@ function Dashboard({ user, onLogout }) {
     };
 
     return `${formatSingleTime(start)} - ${formatSingleTime(end)}`;
-  };
+  }, []);
 
-  // Function to handle sorting
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    const newSortConfig = { key, direction };
-    setSortConfig(newSortConfig);
-    // Save to localStorage
-    localStorage.setItem("sortConfig", JSON.stringify(newSortConfig));
-    setShowSortMenu(false);
-  };
-
-  // Function to sort courses
-  const sortCourses = (coursesToSort) => {
+  // Memoize the sortCourses function
+  const sortCourses = useCallback((coursesToSort) => {
     return [...coursesToSort].sort((a, b) => {
       if (sortConfig.key === "time") {
         const [aStart] = a.time.split(" - ").map((t) => t.trim());
@@ -95,26 +80,45 @@ function Dashboard({ user, onLogout }) {
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     });
-  };
+  }, [sortConfig]);
+
+  // Memoize the sorted courses
+  const sortedCourses = useMemo(() => sortCourses(courses), [courses, sortCourses]);
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`${API_URL}/courses`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+        timeout: 5000, // Add timeout
       });
       setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
+      setError("Failed to fetch courses. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }, [user.token]);
 
+  // Add error boundary
   useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  // Optimize initial data fetch
+  useEffect(() => {
+    const controller = new AbortController();
     fetchCourses();
+    return () => controller.abort();
   }, [fetchCourses]);
 
   const handleAddCourse = () => {
@@ -197,11 +201,26 @@ function Dashboard({ user, onLogout }) {
     setShowLogout(!showLogout);
   };
 
-  // Sort courses before rendering
-  const sortedCourses = sortCourses(courses);
+  // Function to handle sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    const newSortConfig = { key, direction };
+    setSortConfig(newSortConfig);
+    // Save to localStorage
+    localStorage.setItem("sortConfig", JSON.stringify(newSortConfig));
+    setShowSortMenu(false);
+  };
 
   return (
     <div className="dashboard-container">
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
       <header className="dashboard-header">
         <div
           className="header-left nav-refresh"
