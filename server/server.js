@@ -11,28 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// CORS configuration
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://class-schedule-ruby.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
-});
-
-// Enable CORS for all routes
-app.use(cors({
-  origin: 'https://class-schedule-ruby.vercel.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+// Middleware
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
@@ -43,17 +23,11 @@ const mongoClient = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
-  maxPoolSize: 50,
-  minPoolSize: 10,
-  maxIdleTimeMS: 30000,
-  connectTimeoutMS: 5000,
-  socketTimeoutMS: 30000,
-  keepAlive: true,
-  keepAliveInitialDelay: 300000,
-  retryWrites: true,
-  retryReads: true,
-  w: 'majority',
-  readPreference: 'primaryPreferred'
+  maxPoolSize: 10,
+  minPoolSize: 5,
+  maxIdleTimeMS: 60000,
+  connectTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
 });
 
 async function run() {
@@ -110,7 +84,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-// Course Schema with indexes
+// Course Schema
 const courseSchema = new mongoose.Schema({
   courseCode: { type: String, required: true },
   title: { type: String, required: true },
@@ -120,14 +94,7 @@ const courseSchema = new mongoose.Schema({
   room: { type: String, required: true },
   instructor: { type: String, required: true },
   userEmail: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
 });
-
-// Add compound indexes for common queries
-courseSchema.index({ userEmail: 1, courseCode: 1 }, { unique: true });
-courseSchema.index({ userEmail: 1, title: 1 }, { unique: true });
-courseSchema.index({ userEmail: 1, days: 1, time: 1 });
-courseSchema.index({ userEmail: 1, createdAt: -1 });
 
 const Course = mongoose.model("Course", courseSchema);
 
@@ -169,10 +136,7 @@ app.get("/api", (req, res) => {
 
 app.get("/api/courses", authenticate, async (req, res) => {
   try {
-    const courses = await Course.find({ userEmail: req.user.email })
-      .sort({ createdAt: -1 })
-      .lean()
-      .cache(60);
+    const courses = await Course.find({ userEmail: req.user.email });
     res.json(courses);
   } catch (error) {
     console.error("Error fetching courses:", error);

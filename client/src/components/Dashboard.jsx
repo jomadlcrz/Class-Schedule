@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import CourseModal from "./CourseModal";
 import {
@@ -16,16 +16,6 @@ import logo from "../assets/logo.png";
 import { motion } from "framer-motion";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-
-// Configure axios instance
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
 
 // Add a hook to get window width
 function useWindowWidth() {
@@ -47,16 +37,18 @@ function Dashboard({ user, onLogout }) {
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState(() => {
+    // Initialize sort config from localStorage or default to time/asc
     const savedSort = localStorage.getItem("sortConfig");
-    return savedSort ? JSON.parse(savedSort) : { key: "time", direction: "asc" };
+    return savedSort
+      ? JSON.parse(savedSort)
+      : { key: "time", direction: "asc" };
   });
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const [error, setError] = useState(null);
 
   const width = useWindowWidth();
 
-  // Memoize the formatTime function
-  const formatTime = useCallback((timeStr) => {
+  // Function to convert 24h time to 12h format
+  const formatTime = (timeStr) => {
     if (!timeStr) return "";
     const [start, end] = timeStr.split(" - ").map((t) => t.trim());
     if (!start || !end) return timeStr;
@@ -70,10 +62,23 @@ function Dashboard({ user, onLogout }) {
     };
 
     return `${formatSingleTime(start)} - ${formatSingleTime(end)}`;
-  }, []);
+  };
 
-  // Memoize the sortCourses function
-  const sortCourses = useCallback((coursesToSort) => {
+  // Function to handle sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    const newSortConfig = { key, direction };
+    setSortConfig(newSortConfig);
+    // Save to localStorage
+    localStorage.setItem("sortConfig", JSON.stringify(newSortConfig));
+    setShowSortMenu(false);
+  };
+
+  // Function to sort courses
+  const sortCourses = (coursesToSort) => {
     return [...coursesToSort].sort((a, b) => {
       if (sortConfig.key === "time") {
         const [aStart] = a.time.split(" - ").map((t) => t.trim());
@@ -90,55 +95,26 @@ function Dashboard({ user, onLogout }) {
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     });
-  }, [sortConfig]);
-
-  // Memoize the sorted courses
-  const sortedCourses = useMemo(() => sortCourses(courses), [courses, sortCourses]);
+  };
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
-    setError(null);
     try {
-      const response = await axiosInstance.get(`/courses`, {
+      const response = await axios.get(`${API_URL}/courses`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-        timeout: 5000,
       });
       setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        setError(error.response.data.message || "Failed to fetch courses. Please try again.");
-      } else if (error.request) {
-        // The request was made but no response was received
-        setError("No response from server. Please check your internet connection.");
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        setError("An error occurred while fetching courses.");
-      }
     } finally {
       setIsLoading(false);
     }
   }, [user.token]);
 
-  // Add error boundary
   useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
-  // Optimize initial data fetch
-  useEffect(() => {
-    const controller = new AbortController();
     fetchCourses();
-    return () => controller.abort();
   }, [fetchCourses]);
 
   const handleAddCourse = () => {
@@ -158,7 +134,7 @@ function Dashboard({ user, onLogout }) {
 
   const confirmDeleteCourse = async () => {
     try {
-      await axiosInstance.delete(`/courses/${courseToDeleteId}`, {
+      await axios.delete(`${API_URL}/courses/${courseToDeleteId}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -181,8 +157,8 @@ function Dashboard({ user, onLogout }) {
     try {
       if (course._id) {
         // Update existing course
-        const response = await axiosInstance.put(
-          `/courses/${course._id}`,
+        const response = await axios.put(
+          `${API_URL}/courses/${course._id}`,
           course,
           {
             headers: {
@@ -195,7 +171,7 @@ function Dashboard({ user, onLogout }) {
         }
       } else {
         // Add new course
-        const response = await axiosInstance.post(`/courses`, course, {
+        const response = await axios.post(`${API_URL}/courses`, course, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -221,26 +197,11 @@ function Dashboard({ user, onLogout }) {
     setShowLogout(!showLogout);
   };
 
-  // Function to handle sorting
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    const newSortConfig = { key, direction };
-    setSortConfig(newSortConfig);
-    // Save to localStorage
-    localStorage.setItem("sortConfig", JSON.stringify(newSortConfig));
-    setShowSortMenu(false);
-  };
+  // Sort courses before rendering
+  const sortedCourses = sortCourses(courses);
 
   return (
     <div className="dashboard-container">
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
       <header className="dashboard-header">
         <div
           className="header-left nav-refresh"
