@@ -1,5 +1,5 @@
-import React from 'react';
-import '../styles/DeleteConfirmationModal.css'; // Create this CSS file
+import React from "react";
+import "../styles/DeleteConfirmationModal.css"; // Create this CSS file
 
 function DeleteConfirmationModal({ isOpen, onConfirm, onCancel, courseId }) {
   if (!isOpen) {

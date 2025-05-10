@@ -22,24 +22,27 @@ function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <img 
-          src={window.preloadedImages?.logo || logo} 
-          alt="GWC Logo" 
+        <img
+          src={window.preloadedImages?.logo || logo}
+          alt="GWC Logo"
           className="logo"
-          style={{ 
+          style={{
             opacity: 1,
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            pointerEvents: 'none'
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            MozUserSelect: "none",
+            msUserSelect: "none",
+            pointerEvents: "none",
           }}
         />
         <h1>Class Schedule System</h1>
         <p>
           Please sign in with your Google account to access your class schedule.
         </p>
-        <div className="google-login-wrapper" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
+        <div
+          className="google-login-wrapper"
+          style={{ userSelect: "none", WebkitUserSelect: "none" }}
+        >
           <GoogleLogin
             onSuccess={handleSuccess}
             onError={handleError}

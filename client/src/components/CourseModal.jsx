@@ -24,11 +24,15 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
     const options = [];
     for (let hour = 7; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        const period = hour >= 12 ? 'PM' : 'AM';
-        const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-        const time = `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${period}`;
+        const period = hour >= 12 ? "PM" : "AM";
+        const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+        const time = `${displayHour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")} ${period}`;
         // Store 24-hour format as value but display 12-hour format
-        const value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const value = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
         options.push({ value, time });
       }
     }
@@ -87,7 +91,11 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       await onSave({ ...formData, time: timeString });
       onClose();
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         setError(error.response.data.message);
       } else {
         setError("An error occurred while saving the course");
@@ -103,11 +111,11 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       setFormData(newFormData);
       let startTimeValue = "";
       let endTimeValue = "";
-      
+
       if (course.time && course.time.includes("-")) {
-        const [start, end] = course.time.split("-").map(s => s.trim());
-        startTimeValue = start ? start.padStart(5, '0').slice(0,5) : "";
-        endTimeValue = end ? end.padStart(5, '0').slice(0,5) : "";
+        const [start, end] = course.time.split("-").map((s) => s.trim());
+        startTimeValue = start ? start.padStart(5, "0").slice(0, 5) : "";
+        endTimeValue = end ? end.padStart(5, "0").slice(0, 5) : "";
         setStartTime(startTimeValue);
         setEndTime(endTimeValue);
       } else {
@@ -118,7 +126,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
       setOriginalData({
         ...newFormData,
         startTime: startTimeValue,
-        endTime: endTimeValue
+        endTime: endTimeValue,
       });
     } else {
       setFormData({
@@ -140,45 +148,53 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   const hasChanges = () => {
     if (!course) return false; // For new course, always consider as changed
     if (!originalData) return true;
-    
-    return formData.courseCode !== originalData.courseCode ||
-           formData.title !== originalData.title ||
-           formData.units !== originalData.units ||
-           formData.days !== originalData.days ||
-           formData.room !== originalData.room ||
-           formData.instructor !== originalData.instructor ||
-           startTime !== originalData.startTime ||
-           endTime !== originalData.endTime;
+
+    return (
+      formData.courseCode !== originalData.courseCode ||
+      formData.title !== originalData.title ||
+      formData.units !== originalData.units ||
+      formData.days !== originalData.days ||
+      formData.room !== originalData.room ||
+      formData.instructor !== originalData.instructor ||
+      startTime !== originalData.startTime ||
+      endTime !== originalData.endTime
+    );
   };
 
   const hasAnyValue = () => {
-    return formData.courseCode || 
-           formData.title || 
-           formData.units || 
-           formData.days || 
-           startTime || 
-           endTime || 
-           formData.room || 
-           formData.instructor;
+    return (
+      formData.courseCode ||
+      formData.title ||
+      formData.units ||
+      formData.days ||
+      startTime ||
+      endTime ||
+      formData.room ||
+      formData.instructor
+    );
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={(e) => {
-      // For add form: prevent closing if any field has value
-      // For edit form: prevent closing if there are changes
-      if (e.target === e.currentTarget) {
-        if (!course && hasAnyValue()) {
-          return; // Don't close if any field has value in add form
+    <div
+      className="modal-overlay"
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
+      onClick={(e) => {
+        // For add form: prevent closing if any field has value
+        // For edit form: prevent closing if there are changes
+        if (e.target === e.currentTarget) {
+          if (!course && hasAnyValue()) {
+            return; // Don't close if any field has value in add form
+          }
+          if (course && hasChanges()) {
+            return; // Don't close if there are changes in edit form
+          }
+          onClose();
         }
-        if (course && hasChanges()) {
-          return; // Don't close if there are changes in edit form
-        }
-        onClose();
-      }
-    }}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+      }}
+    >
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{course ? "Edit Course" : "Add New Course"}</h2>
           <button className="close-button" onClick={onClose}>
@@ -216,9 +232,9 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
               id="units"
               name="units"
               value={formData.units}
-              onChange={e => {
-                let value = e.target.value.replace(/[^0-9]/g, '').slice(0,2);
-                setFormData(prev => ({ ...prev, units: value }));
+              onChange={(e) => {
+                let value = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
+                setFormData((prev) => ({ ...prev, units: value }));
               }}
               min={1}
               max={99}
@@ -241,7 +257,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
           </div>
           <div className="form-group">
             <label htmlFor="time">Time</label>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <select
                 id="startTime"
                 name="startTime"
@@ -301,8 +317,21 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
             />
           </div>
           <div className="modal-footer">
-            <button type="submit" className="save-button" disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : (course ? "Update" : "Add") + " Course"}
+            <button
+              type="submit"
+              className="save-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  Please wait...
+                  <div className="spinner"></div>
+                </span>
+              ) : (
+                `${course ? "Update" : "Add"} Course`
+              )}
             </button>
           </div>
         </form>

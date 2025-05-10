@@ -36,7 +36,9 @@ async function run() {
     await mongoClient.connect();
     // Send a ping to confirm a successful connection
     await mongoClient.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
 
     // Use Mongoose with the existing MongoClient instance
     await mongoose.connect(uri, {
@@ -60,13 +62,13 @@ async function run() {
         run().catch(console.dir);
       }, 5000);
     });
-    
+
     db.once("open", () => {
       console.log("Mongoose connected to MongoDB");
     });
 
     // Handle application shutdown
-    process.on('SIGINT', async () => {
+    process.on("SIGINT", async () => {
       await mongoose.connection.close();
       await mongoClient.close();
       process.exit(0);
@@ -147,7 +149,7 @@ app.post("/api/courses", authenticate, async (req, res) => {
     // Check for duplicate course code
     const existingCourseCode = await Course.findOne({
       courseCode: req.body.courseCode,
-      userEmail: req.user.email
+      userEmail: req.user.email,
     });
     if (existingCourseCode) {
       return res.status(400).json({ message: "Course Code already exists" });
@@ -156,10 +158,12 @@ app.post("/api/courses", authenticate, async (req, res) => {
     // Check for duplicate title
     const existingTitle = await Course.findOne({
       title: req.body.title,
-      userEmail: req.user.email
+      userEmail: req.user.email,
     });
     if (existingTitle) {
-      return res.status(400).json({ message: "Descriptive Title already exists" });
+      return res
+        .status(400)
+        .json({ message: "Descriptive Title already exists" });
     }
 
     // Check for schedule conflict with same course code
@@ -167,10 +171,12 @@ app.post("/api/courses", authenticate, async (req, res) => {
       courseCode: req.body.courseCode,
       userEmail: req.user.email,
       days: req.body.days,
-      time: req.body.time
+      time: req.body.time,
     });
     if (existingCourseCodeConflict) {
-      return res.status(400).json({ message: "Schedule conflict: Course Code already exists" });
+      return res
+        .status(400)
+        .json({ message: "Schedule conflict: Course Code already exists" });
     }
 
     // Check for schedule conflict with same title
@@ -178,10 +184,14 @@ app.post("/api/courses", authenticate, async (req, res) => {
       title: req.body.title,
       userEmail: req.user.email,
       days: req.body.days,
-      time: req.body.time
+      time: req.body.time,
     });
     if (existingTitleConflict) {
-      return res.status(400).json({ message: "Schedule conflict: Descriptive Title already exists" });
+      return res
+        .status(400)
+        .json({
+          message: "Schedule conflict: Descriptive Title already exists",
+        });
     }
 
     const newCourse = new Course({
@@ -212,7 +222,7 @@ app.put("/api/courses/:id", authenticate, async (req, res) => {
     const existingCourseCode = await Course.findOne({
       courseCode: req.body.courseCode,
       userEmail: req.user.email,
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingCourseCode) {
       return res.status(400).json({ message: "Course Code already exists" });
@@ -222,10 +232,12 @@ app.put("/api/courses/:id", authenticate, async (req, res) => {
     const existingTitle = await Course.findOne({
       title: req.body.title,
       userEmail: req.user.email,
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingTitle) {
-      return res.status(400).json({ message: "Descriptive Title already exists" });
+      return res
+        .status(400)
+        .json({ message: "Descriptive Title already exists" });
     }
 
     // Check for schedule conflict with same course code (excluding current course)
@@ -234,10 +246,12 @@ app.put("/api/courses/:id", authenticate, async (req, res) => {
       userEmail: req.user.email,
       days: req.body.days,
       time: req.body.time,
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingCourseCodeConflict) {
-      return res.status(400).json({ message: "Schedule conflict: Course Code already exists" });
+      return res
+        .status(400)
+        .json({ message: "Schedule conflict: Course Code already exists" });
     }
 
     // Check for schedule conflict with same title (excluding current course)
@@ -246,10 +260,14 @@ app.put("/api/courses/:id", authenticate, async (req, res) => {
       userEmail: req.user.email,
       days: req.body.days,
       time: req.body.time,
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingTitleConflict) {
-      return res.status(400).json({ message: "Schedule conflict: Descriptive Title already exists" });
+      return res
+        .status(400)
+        .json({
+          message: "Schedule conflict: Descriptive Title already exists",
+        });
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(

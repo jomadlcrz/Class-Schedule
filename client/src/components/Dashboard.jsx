@@ -3,9 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import CourseModal from "./CourseModal";
-import { FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaSortAmountDown } from "react-icons/fa";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaSignOutAlt,
+  FaSortAmountDown,
+} from "react-icons/fa";
 import "../styles/Dashboard.css";
-import DeleteConfirmationModal from './DeleteConfirmationModal'; // Import the new component
+import DeleteConfirmationModal from "./DeleteConfirmationModal"; // Import the new component
 import logo from "../assets/logo.png";
 import { motion } from "framer-motion";
 
@@ -16,8 +22,8 @@ function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
   return width;
 }
@@ -32,8 +38,10 @@ function Dashboard({ user, onLogout }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState(() => {
     // Initialize sort config from localStorage or default to time/asc
-    const savedSort = localStorage.getItem('sortConfig');
-    return savedSort ? JSON.parse(savedSort) : { key: 'time', direction: 'asc' };
+    const savedSort = localStorage.getItem("sortConfig");
+    return savedSort
+      ? JSON.parse(savedSort)
+      : { key: "time", direction: "asc" };
   });
   const [showSortMenu, setShowSortMenu] = useState(false);
 
@@ -42,14 +50,14 @@ function Dashboard({ user, onLogout }) {
   // Function to convert 24h time to 12h format
   const formatTime = (timeStr) => {
     if (!timeStr) return "";
-    const [start, end] = timeStr.split(" - ").map(t => t.trim());
+    const [start, end] = timeStr.split(" - ").map((t) => t.trim());
     if (!start || !end) return timeStr;
 
     const formatSingleTime = (time) => {
       const [hours, minutes] = time.split(":");
       const hour = parseInt(hours);
       const period = hour >= 12 ? "PM" : "AM";
-      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+      const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
       return `${displayHour.toString().padStart(2, "0")}:${minutes} ${period}`;
     };
 
@@ -58,32 +66,32 @@ function Dashboard({ user, onLogout }) {
 
   // Function to handle sorting
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     const newSortConfig = { key, direction };
     setSortConfig(newSortConfig);
     // Save to localStorage
-    localStorage.setItem('sortConfig', JSON.stringify(newSortConfig));
+    localStorage.setItem("sortConfig", JSON.stringify(newSortConfig));
     setShowSortMenu(false);
   };
 
   // Function to sort courses
   const sortCourses = (coursesToSort) => {
     return [...coursesToSort].sort((a, b) => {
-      if (sortConfig.key === 'time') {
-        const [aStart] = a.time.split(" - ").map(t => t.trim());
-        const [bStart] = b.time.split(" - ").map(t => t.trim());
-        return sortConfig.direction === 'asc' 
+      if (sortConfig.key === "time") {
+        const [aStart] = a.time.split(" - ").map((t) => t.trim());
+        const [bStart] = b.time.split(" - ").map((t) => t.trim());
+        return sortConfig.direction === "asc"
           ? aStart.localeCompare(bStart)
           : bStart.localeCompare(aStart);
       }
-      
-      const aValue = a[sortConfig.key]?.toLowerCase() || '';
-      const bValue = b[sortConfig.key]?.toLowerCase() || '';
-      
-      return sortConfig.direction === 'asc'
+
+      const aValue = a[sortConfig.key]?.toLowerCase() || "";
+      const bValue = b[sortConfig.key]?.toLowerCase() || "";
+
+      return sortConfig.direction === "asc"
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     });
@@ -127,10 +135,10 @@ function Dashboard({ user, onLogout }) {
   const confirmDeleteCourse = async () => {
     try {
       await axios.delete(`${API_URL}/courses/${courseToDeleteId}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       fetchCourses();
     } catch (error) {
       console.error("Error deleting course:", error);
@@ -149,11 +157,15 @@ function Dashboard({ user, onLogout }) {
     try {
       if (course._id) {
         // Update existing course
-        const response = await axios.put(`${API_URL}/courses/${course._id}`, course, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        const response = await axios.put(
+          `${API_URL}/courses/${course._id}`,
+          course,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
         if (response.data) {
           fetchCourses();
         }
@@ -169,7 +181,11 @@ function Dashboard({ user, onLogout }) {
         }
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         throw error; // This will be caught by CourseModal's handleSubmit
       } else {
         throw new Error("An error occurred while saving the course");
@@ -187,39 +203,43 @@ function Dashboard({ user, onLogout }) {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <div className="header-left nav-refresh" onClick={() => window.location.reload()} style={{cursor: 'pointer'}}>
-          <img 
-            src={window.preloadedImages?.logo || logo} 
-            alt="Logo" 
+        <div
+          className="header-left nav-refresh"
+          onClick={() => window.location.reload()}
+          style={{ cursor: "pointer" }}
+        >
+          <img
+            src={window.preloadedImages?.logo || logo}
+            alt="Logo"
             className="header-logo"
-            style={{ 
+            style={{
               opacity: 1,
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              MozUserSelect: 'none',
-              msUserSelect: 'none',
-              pointerEvents: 'none'
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              MozUserSelect: "none",
+              msUserSelect: "none",
+              pointerEvents: "none",
             }}
           />
           <h1>CLASS SCHEDULE</h1>
         </div>
         <div className="header-right">
           <div className="user-menu">
-            <img 
-              src={user.imageUrl} 
-              alt="Profile" 
+            <img
+              src={user.imageUrl}
+              alt="Profile"
               className="user-icon"
               onClick={toggleLogout}
-              style={{ 
-                width: '32px', 
-                height: '32px', 
-                borderRadius: '50%', 
-                cursor: 'pointer', 
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                cursor: "pointer",
                 opacity: 1,
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                MozUserSelect: 'none',
-                msUserSelect: 'none'
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                MozUserSelect: "none",
+                msUserSelect: "none",
               }}
             />
             {showLogout && (
@@ -253,51 +273,54 @@ function Dashboard({ user, onLogout }) {
 
         <div className="table-controls">
           <div className="sort-container">
-            <button className="sort-button" onClick={() => setShowSortMenu(!showSortMenu)}>
+            <button
+              className="sort-button"
+              onClick={() => setShowSortMenu(!showSortMenu)}
+            >
               <FaSortAmountDown />
               <span className="action-tooltip">Sort</span>
             </button>
             {showSortMenu && (
               <div className="sort-menu">
-                <button 
-                  onClick={() => handleSort('courseCode')}
-                  className={sortConfig.key === 'courseCode' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("courseCode")}
+                  className={sortConfig.key === "courseCode" ? "active" : ""}
                 >
                   Course Code
                 </button>
-                <button 
-                  onClick={() => handleSort('title')}
-                  className={sortConfig.key === 'title' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("title")}
+                  className={sortConfig.key === "title" ? "active" : ""}
                 >
                   Title
                 </button>
-                <button 
-                  onClick={() => handleSort('units')}
-                  className={sortConfig.key === 'units' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("units")}
+                  className={sortConfig.key === "units" ? "active" : ""}
                 >
                   Units
                 </button>
-                <button 
-                  onClick={() => handleSort('days')}
-                  className={sortConfig.key === 'days' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("days")}
+                  className={sortConfig.key === "days" ? "active" : ""}
                 >
                   Days
                 </button>
-                <button 
-                  onClick={() => handleSort('time')}
-                  className={sortConfig.key === 'time' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("time")}
+                  className={sortConfig.key === "time" ? "active" : ""}
                 >
                   Time
                 </button>
-                <button 
-                  onClick={() => handleSort('room')}
-                  className={sortConfig.key === 'room' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("room")}
+                  className={sortConfig.key === "room" ? "active" : ""}
                 >
                   Room
                 </button>
-                <button 
-                  onClick={() => handleSort('instructor')}
-                  className={sortConfig.key === 'instructor' ? 'active' : ''}
+                <button
+                  onClick={() => handleSort("instructor")}
+                  className={sortConfig.key === "instructor" ? "active" : ""}
                 >
                   Instructor
                 </button>
@@ -317,7 +340,9 @@ function Dashboard({ user, onLogout }) {
             {isLoading ? (
               <div className="loading-message">Loading...</div>
             ) : sortedCourses.length === 0 ? (
-              <div className="empty-message">No courses found. Add a course to get started.</div>
+              <div className="empty-message">
+                No courses found. Add a course to get started.
+              </div>
             ) : (
               sortedCourses.map((course) => (
                 <motion.div
@@ -330,19 +355,44 @@ function Dashboard({ user, onLogout }) {
                 >
                   <div className="course-card-header">
                     <div>
-                      <span className="course-card-code">{course.courseCode}</span>
+                      <span className="course-card-code">
+                        {course.courseCode}
+                      </span>
                       <div className="course-card-title">{course.title}</div>
                     </div>
                     <div className="course-card-actions">
-                      <button className="edit-button" onClick={() => handleEditCourse(course)}><FaEdit /></button>
-                      <button className="delete-button" onClick={() => handleDeleteCourse(course._id)}><FaTrash /></button>
+                      <button
+                        className="edit-button"
+                        onClick={() => handleEditCourse(course)}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={() => handleDeleteCourse(course._id)}
+                      >
+                        <FaTrash />
+                      </button>
                     </div>
                   </div>
-                  <div className="course-card-detail"><b>Units:</b> {course.units}</div>
-                  <div className="course-card-detail"><b>Days:</b> {course.days}</div>
-                  <div className="course-card-detail"><b>Time:</b> {formatTime(course.time)}</div>
-                  <div className="course-card-detail"><b>Room:</b> {course.room}</div>
-                  <div className="course-card-detail"><b>Instructor:</b> <span className="course-card-instructor">{course.instructor}</span></div>
+                  <div className="course-card-detail">
+                    <b>Units:</b> {course.units}
+                  </div>
+                  <div className="course-card-detail">
+                    <b>Days:</b> {course.days}
+                  </div>
+                  <div className="course-card-detail">
+                    <b>Time:</b> {formatTime(course.time)}
+                  </div>
+                  <div className="course-card-detail">
+                    <b>Room:</b> {course.room}
+                  </div>
+                  <div className="course-card-detail">
+                    <b>Instructor:</b>{" "}
+                    <span className="course-card-instructor">
+                      {course.instructor}
+                    </span>
+                  </div>
                 </motion.div>
               ))
             )}
@@ -444,4 +494,3 @@ function Dashboard({ user, onLogout }) {
 }
 
 export default Dashboard;
-
