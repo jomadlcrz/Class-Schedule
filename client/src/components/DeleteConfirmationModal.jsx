@@ -7,8 +7,8 @@ function DeleteConfirmationModal({ isOpen, onConfirm, onCancel, courseId }) {
   }
 
   return (
-    <div className="delete-modal-overlay">
-      <div className="delete-modal">
+    <div className="delete-modal-overlay" onClick={onCancel}>
+      <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
         <h2>Confirm Delete</h2>
         <p>Are you sure you want to delete this course?</p>
         <div className="delete-modal-actions">

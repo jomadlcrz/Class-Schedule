@@ -47,6 +47,20 @@ function Dashboard({ user, onLogout }) {
 
   const width = useWindowWidth();
 
+  // Add click outside handler for sort menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSortMenu && !event.target.closest('.sort-container')) {
+        setShowSortMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSortMenu]);
+
   // Function to convert 24h time to 12h format
   const formatTime = (timeStr) => {
     if (!timeStr) return "";
@@ -274,7 +288,7 @@ function Dashboard({ user, onLogout }) {
         <div className="table-controls">
           <div className="sort-container">
             <button
-              className="sort-button"
+              className={`sort-button ${showSortMenu ? 'active' : ''}`}
               onClick={() => setShowSortMenu(!showSortMenu)}
             >
               <FaSortAmountDown />

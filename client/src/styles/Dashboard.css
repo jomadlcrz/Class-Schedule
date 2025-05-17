@@ -209,19 +209,21 @@
   border-radius: 4px;
   padding: 4px 8px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .edit-button:hover,
 .delete-button:hover {
-  background-color: #f0f0f0;
+  background-color: #e0e0e0;
+  border-color: #ccc;
 }
 
-.edit-button {
-  color: #2196f3;
+.edit-button:hover {
+  color: #1976d2;
 }
 
-.delete-button {
-  color: #f44336;
+.delete-button:hover {
+  color: #d32f2f;
 }
 
 .loading-message,
@@ -453,8 +455,6 @@
 
 .sort-button.active {
   background-color: #e3f2fd;
-  color: #1976d2;
-  border-color: #1976d2;
 }
 
 .sort-button svg {
@@ -493,6 +493,5 @@
 
 .sort-menu button.active {
   background-color: #e3f2fd;
-  color: #1976d2;
   font-weight: 500;
 }
