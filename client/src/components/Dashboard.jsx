@@ -47,11 +47,14 @@ function Dashboard({ user, onLogout }) {
 
   const width = useWindowWidth();
 
-  // Add click outside handler for sort menu
+  // Add click outside handler for sort menu and logout dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showSortMenu && !event.target.closest('.sort-container')) {
         setShowSortMenu(false);
+      }
+      if (showLogout && !event.target.closest('.user-menu')) {
+        setShowLogout(false);
       }
     };
 
@@ -59,7 +62,7 @@ function Dashboard({ user, onLogout }) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showSortMenu]);
+  }, [showSortMenu, showLogout]);
 
   // Function to convert 24h time to 12h format
   const formatTime = (timeStr) => {
