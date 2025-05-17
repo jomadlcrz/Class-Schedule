@@ -179,7 +179,7 @@ function CourseModal({ isOpen, onClose, onSave, course }) {
   return (
     <div
       className="modal-overlay"
-      style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
       onClick={(e) => {
         // For add form: prevent closing if any field has value
         // For edit form: prevent closing if there are changes
