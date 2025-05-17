@@ -95,10 +95,16 @@ input:focus {
   background-color: #2196f3;
   border: none;
   color: white;
+  transition: opacity 0.3s ease;
 }
 
-.save-button:hover {
+.save-button:not(:disabled):hover {
   background-color: #0b7dda;
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .cancel-button:hover {
