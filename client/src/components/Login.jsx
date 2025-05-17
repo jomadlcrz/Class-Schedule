@@ -59,25 +59,6 @@ function Login({ onLogin }) {
           <button
             onClick={() => login()}
             className="custom-google-button"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              padding: '10px 20px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              backgroundColor: 'white',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#757575',
-              width: '250px',
-              transition: 'background-color 0.3s ease',
-              '&:hover': {
-                backgroundColor: '#f5f5f5'
-              }
-            }}
           >
             <img
               src="https://www.google.com/favicon.ico"
