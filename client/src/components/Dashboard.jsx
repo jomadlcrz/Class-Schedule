@@ -227,6 +227,8 @@ function Dashboard({ user, onLogout }) {
             alt="Logo"
             className="header-logo"
             style={{
+              width: "56px",
+              height: "56px",
               opacity: 1,
               userSelect: "none",
               WebkitUserSelect: "none",

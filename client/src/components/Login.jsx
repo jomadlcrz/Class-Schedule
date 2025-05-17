@@ -38,6 +38,8 @@ function Login({ onLogin }) {
           alt="GWC Logo"
           className="logo"
           style={{
+            width: "136px",
+            height: "136px",
             opacity: 1,
             userSelect: "none",
             WebkitUserSelect: "none",
