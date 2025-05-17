@@ -4,6 +4,7 @@ const cors = require("cors");
 const { OAuth2Client } = require("google-auth-library");
 const dotenv = require("dotenv");
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const fetch = require("node-fetch");
 
 dotenv.config();
 
@@ -106,17 +107,22 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const token = authHeader.split(" ")[1];
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+    const accessToken = authHeader.split(" ")[1];
+    
+    // Verify the access token by making a request to Google's userinfo endpoint
+    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    const payload = ticket.getPayload();
+    if (!response.ok) {
+      throw new Error('Invalid access token');
+    }
+
+    const userInfo = await response.json();
     req.user = {
-      email: payload.email,
-      name: payload.name,
-      picture: payload.picture,
+      email: userInfo.email,
+      name: userInfo.name,
+      picture: userInfo.picture,
     };
     next();
   } catch (error) {

@@ -1,23 +1,34 @@
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+import { useGoogleLogin } from "@react-oauth/google";
 import logo from "../assets/logo.png";
 import "../styles/Login.css";
 
 function Login({ onLogin }) {
-  const handleSuccess = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential);
-    const userData = {
-      email: decoded.email,
-      name: decoded.name,
-      imageUrl: decoded.picture,
-      token: credentialResponse.credential,
-    };
-    onLogin(userData);
-  };
+  const login = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        // Get user info using the access token
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${response.access_token}` },
+        }).then(res => res.json());
 
-  const handleError = () => {
-    console.error("Login Failed");
-  };
+        const userData = {
+          email: userInfo.email,
+          name: userInfo.name,
+          imageUrl: userInfo.picture,
+          token: response.access_token,
+        };
+        
+        onLogin(userData);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    },
+    onError: () => {
+      console.error("Login Failed");
+    },
+    flow: "implicit",
+    scope: "email profile"
+  });
 
   return (
     <div className="login-container">
@@ -43,15 +54,36 @@ function Login({ onLogin }) {
           className="google-login-wrapper"
           style={{ userSelect: "none", WebkitUserSelect: "none" }}
         >
-          <GoogleLogin
-            onSuccess={handleSuccess}
-            onError={handleError}
-            useOneTap
-            type="icon"
-            shape="circle"
-            size="large"
-            logo_alignment="center"
-          />
+          <button
+            onClick={() => login()}
+            className="custom-google-button"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              padding: '10px 20px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#757575',
+              width: '250px',
+              transition: 'background-color 0.3s ease',
+              '&:hover': {
+                backgroundColor: '#f5f5f5'
+              }
+            }}
+          >
+            <img
+              src="https://www.google.com/favicon.ico"
+              alt="Google"
+              style={{ width: '18px', height: '18px' }}
+            />
+            Continue with Google
+          </button>
         </div>
       </div>
     </div>
