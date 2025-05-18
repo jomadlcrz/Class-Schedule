@@ -76,7 +76,31 @@ function App() {
     };
 
     checkLoggedIn();
-  }, []);
+
+    let isRefreshing = false;
+
+    // Handle page refresh
+    window.addEventListener('beforeunload', () => {
+      isRefreshing = true;
+    });
+
+    // Handle actual page close
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && isAuthenticated && !isRefreshing) {
+        handleLogout();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup event listeners
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', () => {
+        isRefreshing = true;
+      });
+    };
+  }, [isAuthenticated]);
 
   const handleLogin = (userData) => {
     setUser(userData);
