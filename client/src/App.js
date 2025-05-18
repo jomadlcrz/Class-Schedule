@@ -55,7 +55,7 @@ function App() {
     // Check if user is already logged in
     const checkLoggedIn = async () => {
       try {
-        const loggedInUser = localStorage.getItem("user");
+        const loggedInUser = sessionStorage.getItem("user");
         if (loggedInUser) {
           const foundUser = JSON.parse(loggedInUser);
           // Verify token is still valid
@@ -64,12 +64,16 @@ function App() {
             setIsAuthenticated(true);
           } else {
             // If no token, clear invalid data
-            localStorage.removeItem("user");
+            sessionStorage.removeItem("user");
+            setIsAuthenticated(false);
           }
+        } else {
+          setIsAuthenticated(false);
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
+        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
@@ -77,41 +81,43 @@ function App() {
 
     checkLoggedIn();
 
-    let isRefreshing = false;
+    // Handle page close
+    const handleBeforeUnload = (event) => {
+      // Store a flag in sessionStorage to detect page close vs refresh
+      sessionStorage.setItem('isPageClosing', 'true');
+    };
 
-    // Handle page refresh
-    window.addEventListener('beforeunload', () => {
-      isRefreshing = true;
-    });
-
-    // Handle actual page close
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && isAuthenticated && !isRefreshing) {
-        handleLogout();
+    // Handle page load
+    const handlePageLoad = () => {
+      // If the page is being loaded and we have the closing flag, it means it was a refresh
+      if (sessionStorage.getItem('isPageClosing')) {
+        sessionStorage.removeItem('isPageClosing');
+      } else {
+        // If no closing flag, it means the page was closed and reopened
+        sessionStorage.removeItem("user");
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('load', handlePageLoad);
 
     // Cleanup event listeners
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', () => {
-        isRefreshing = true;
-      });
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('load', handlePageLoad);
     };
-  }, [isAuthenticated]);
+  }, []);
 
   const handleLogin = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
+    sessionStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
   };
 
   if (isLoading || !imagesLoaded) {
