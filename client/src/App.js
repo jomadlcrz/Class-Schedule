@@ -65,57 +65,17 @@ function App() {
           } else {
             // If no token, clear invalid data
             localStorage.removeItem("user");
-            setIsAuthenticated(false);
           }
-        } else {
-          setIsAuthenticated(false);
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
         localStorage.removeItem("user");
-        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Check login state immediately
     checkLoggedIn();
-
-    // Track if this is a refresh
-    const isRefreshing = sessionStorage.getItem('isRefreshing');
-    if (!isRefreshing) {
-      sessionStorage.setItem('isRefreshing', 'true');
-    }
-
-    // Handle page close
-    const handleBeforeUnload = () => {
-      // Only clear user data if this is not a refresh
-      if (!sessionStorage.getItem('isRefreshing')) {
-        localStorage.removeItem("user");
-        sessionStorage.removeItem('isRefreshing');
-      }
-    };
-
-    // Handle page load
-    const handlePageLoad = () => {
-      // If the page is being loaded and we have the closing flag, it means it was a refresh
-      if (sessionStorage.getItem('isRefreshing')) {
-        sessionStorage.removeItem('isRefreshing');
-      } else {
-        // If no closing flag, it means the page was closed and reopened
-        localStorage.removeItem("user");
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('load', handlePageLoad);
-
-    // Cleanup event listeners
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('load', handlePageLoad);
-    };
   }, []);
 
   const handleLogin = (userData) => {
