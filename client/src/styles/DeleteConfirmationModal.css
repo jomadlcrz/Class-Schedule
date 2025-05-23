@@ -45,6 +45,7 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s ease;
 }
 
 .delete-cancel-button {
@@ -55,12 +56,21 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s ease;
 }
 
 .delete-confirm-button:hover {
   background-color: #d32f2f;
 }
 
+.delete-confirm-button:active {
+  background-color: #b71c1c;
+}
+
 .delete-cancel-button:hover {
   background-color: #ccc;
+}
+
+.delete-cancel-button:active {
+  background-color: #bbb;
 }
