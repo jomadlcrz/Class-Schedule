@@ -110,7 +110,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s;
 }
 
 .logout-icon {
@@ -119,10 +118,6 @@
 
 .logout-button:hover {
   background-color: #f0f0f0;
-}
-
-.logout-button:active {
-  background-color: #e0e0e0;
 }
 
 .dashboard-content {
@@ -165,15 +160,10 @@
   font-size: 14px;
   width: fit-content;
   margin: 0 auto;
-  transition: background-color 0.2s ease;
 }
 
 .add-button:hover {
   background-color: #43a047;
-}
-
-.add-button:active {
-  background-color: #388e3c;
 }
 
 .table-container {
@@ -231,12 +221,6 @@
 .delete-button:hover {
   background-color: #e0e0e0;
   border-color: #ccc;
-}
-
-.edit-button:active,
-.delete-button:active {
-  background-color: #d0d0d0;
-  border-color: #bbb;
 }
 
 .edit-button:hover {
@@ -474,9 +458,8 @@
   border-color: #ccc;
 }
 
-.sort-button:active {
-  background-color: #d0d0d0;
-  border-color: #bbb;
+.sort-button.active {
+  background-color: #e3f2fd;
 }
 
 .sort-button svg {
@@ -511,10 +494,6 @@
 
 .sort-menu button:hover {
   background-color: #f5f5f5;
-}
-
-.sort-menu button:active {
-  background-color: #e0e0e0;
 }
 
 .sort-menu button.active {
