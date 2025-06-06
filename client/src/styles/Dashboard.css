@@ -22,28 +22,31 @@
 
 .dashboard-header {
   background-color: white;
-  padding: 20px;
+  padding: clamp(15px, 3vw, 20px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: clamp(8px, 2vw, 15px);
 }
 
 .header-logo {
-  height: 40px;
+  height: clamp(32px, 5vw, 40px);
   width: auto;
   object-fit: contain;
 }
 
 .header-left h1 {
-  font-size: 20px;
+  font-size: clamp(16px, 2.5vw, 20px);
   font-weight: bold;
   margin: 0;
 }
@@ -122,7 +125,7 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 20px;
+  padding: clamp(10px, 2vw, 20px);
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -141,7 +144,7 @@
 }
 
 .program-info p {
-  font-size: 16px;
+  font-size: clamp(14px, 1.8vw, 16px);
   color: #666;
   margin: 0;
   font-weight: 500;
@@ -151,13 +154,13 @@
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
   border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: clamp(13px, 1.5vw, 14px);
   width: fit-content;
   margin: 0 auto;
 }
@@ -173,6 +176,8 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .table-container::-webkit-scrollbar {
@@ -187,9 +192,22 @@
 
 .courses-table th,
 .courses-table td {
-  padding: 12px 15px;
+  padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
   text-align: left;
   border-bottom: 1px solid #eee;
+  font-size: clamp(12px, 1.5vw, 14px);
+}
+
+/* Center specific columns */
+.courses-table th:nth-child(3),
+.courses-table td:nth-child(3),
+.courses-table th:nth-child(4),
+.courses-table td:nth-child(4),
+.courses-table th:nth-child(5),
+.courses-table td:nth-child(5),
+.courses-table th:nth-child(6),
+.courses-table td:nth-child(6) {
+  text-align: center;
 }
 
 .courses-table th {
@@ -234,8 +252,9 @@
 .loading-message,
 .empty-message {
   text-align: center;
-  padding: 20px;
+  padding: clamp(15px, 3vw, 20px);
   color: #666;
+  font-size: clamp(13px, 1.5vw, 14px);
 }
 
 .nav-refresh {
@@ -315,8 +334,8 @@
   .mobile-courses-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 0 10px;
+    gap: clamp(12px, 3vw, 16px);
+    padding: 0 clamp(8px, 2vw, 10px);
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -327,11 +346,11 @@
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-    padding: 18px 16px 14px 16px;
+    padding: clamp(14px, 3vw, 18px) clamp(12px, 2vw, 16px);
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: clamp(4px, 1vw, 6px);
     width: 100%;
     box-sizing: border-box;
   }
@@ -340,19 +359,19 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 6px;
+    margin-bottom: clamp(4px, 1vw, 6px);
     width: 100%;
   }
 
   .course-card-code {
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 2vw, 1.1rem);
     display: block;
     margin-bottom: 2px;
   }
 
   .course-card-title {
-    font-size: 0.98rem;
+    font-size: clamp(0.9rem, 1.8vw, 0.98rem);
     color: #888;
     margin-bottom: 2px;
     word-break: break-word;
@@ -365,7 +384,7 @@
   }
 
   .course-card-detail {
-    font-size: 0.97rem;
+    font-size: clamp(0.9rem, 1.8vw, 0.97rem);
     margin-bottom: 1px;
     color: #222;
     word-break: break-word;
@@ -396,11 +415,11 @@
 /* Add styles for very small screens */
 @media (max-width: 480px) {
   .header-left {
-    gap: 8px;
+    gap: 6px;
   }
 
   .header-left h1 {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .dashboard-content {
@@ -442,8 +461,8 @@
   background-color: #f5f5f5;
   color: #666;
   border: 1px solid #ddd;
-  width: 32px;
-  height: 32px;
+  width: clamp(28px, 4vw, 32px);
+  height: clamp(28px, 4vw, 32px);
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -460,10 +479,11 @@
 
 .sort-button.active {
   background-color: #e3f2fd;
+  color: var(--primary-color);
 }
 
 .sort-button svg {
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
 }
 
 .sort-menu {
@@ -474,22 +494,26 @@
   background-color: white;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  min-width: 150px;
+  min-width: clamp(140px, 15vw, 180px);
   z-index: 1000;
 }
 
 .sort-menu button {
   display: block;
   width: 100%;
-  padding: 8px 12px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px);
   text-align: left;
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
   color: #333;
   transition: background-color 0.2s;
   position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 30px; /* Make room for checkmark */
 }
 
 .sort-menu button:hover {
@@ -500,3 +524,92 @@
   background-color: #e3f2fd;
   font-weight: 500;
 }
+.sort-menu button.active::after {
+  content: "✓";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .dashboard-content {
+    padding: clamp(15px, 2vw, 20px);
+  }
+
+  .courses-table {
+    min-width: 700px;
+  }
+
+  .courses-table th,
+  .courses-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .action-buttons {
+    gap: 6px;
+  }
+
+  .edit-button,
+  .delete-button {
+    padding: 3px 6px;
+  }
+}
+
+/* Large desktop styles */
+@media (min-width: 1025px) {
+  .dashboard-content {
+    padding: 25px;
+  }
+
+  .courses-table {
+    min-width: 900px;
+  }
+
+  .courses-table th,
+  .courses-table td {
+    padding: 14px 18px;
+    font-size: 14px;
+  }
+
+  .action-buttons {
+    gap: 10px;
+  }
+
+  .edit-button,
+  .delete-button {
+    padding: 5px 10px;
+  }
+}
+
+/* Improve sort menu positioning for mobile */
+@media (max-width: 480px) {
+  .sort-menu {
+    right: -10px;
+    min-width: 160px;
+  }
+  
+  .sort-menu button {
+    padding: 8px 12px;
+    padding-right: 30px; /* Maintain space for checkmark */
+    font-size: 13px;
+  }
+}
+
+/* Improve sort menu for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .sort-menu button {
+    padding: 10px 12px;
+    padding-right: 30px; /* Maintain space for checkmark */
+  }
+  
+  .sort-menu button:active {
+    background-color: #f5f5f5;
+  }
+}
+
